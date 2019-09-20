@@ -1,21 +1,20 @@
-import React from 'react'
+import TafalkAdminHomeView from './views/Home'
+import TafalkAdminFlagsView from './views/Flags'
+import TafalkAdminUncloggerHintsView from './views/UncloggerHints'
 
 const router = [
   {
-    path: "/",
+    path: '/',
     exact: true,
-    sidebar: () => <div>home!</div>,
-    main: () => <h2>Home</h2>
+    component: TafalkAdminHomeView
   },
   {
-    path: "/bubblegum",
-    sidebar: () => <div>bubblegum!</div>,
-    main: () => <h2>Bubblegum</h2>
+    path: '/flags',
+    component: TafalkAdminFlagsView
   },
   {
-    path: "/shoelaces",
-    sidebar: () => <div>shoelaces!</div>,
-    main: () => <h2>Shoelaces</h2>
+    path: '/uncloggerHints',
+    component: TafalkAdminUncloggerHintsView
   }
 ]
 

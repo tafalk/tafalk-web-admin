@@ -3,7 +3,7 @@ import { Header, Button, Menu } from 'semantic-ui-react'
 
 const TheHeader: React.FC = () => {
   return (
-    <Menu fixed='top' borderless>
+    <Menu borderless pointing>
       <Menu.Item color='red' name='Tafalk! Admin'>
         <Header as='h2' color='red'>
           Tafalk! Admin
