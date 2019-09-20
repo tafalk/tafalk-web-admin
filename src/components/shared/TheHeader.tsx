@@ -14,7 +14,7 @@ const TheHeader: React.FC = () => {
         <Button primary>LOGIN</Button>
       </Menu.Item>
     </Menu>
-  );
+  )
 }
 
 export default TheHeader
