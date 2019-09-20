@@ -1,5 +1,6 @@
 import React from 'react'
 import { Table, Header } from 'semantic-ui-react'
+import { flagTableHeaders } from '../utils/tableUtils'
 
 const FlagsView: React.FC = () => {
   return (
@@ -10,13 +11,13 @@ const FlagsView: React.FC = () => {
       <Table color='olive'>
         <Table.Header>
           <Table.Row>
-            <Table.HeaderCell>Id</Table.HeaderCell>
-            <Table.HeaderCell>Content Id</Table.HeaderCell>
-            <Table.HeaderCell>Flag Category</Table.HeaderCell>
-            <Table.HeaderCell>Flag Details</Table.HeaderCell>
-            <Table.HeaderCell>Status</Table.HeaderCell>
-            <Table.HeaderCell>Created</Table.HeaderCell>
-            <Table.HeaderCell>LastChange</Table.HeaderCell>
+            {flagTableHeaders.map((headerObj, index) => (
+              <Table.HeaderCell
+                key={index}
+              >
+                {headerObj.text}
+              </Table.HeaderCell>
+            ))}
           </Table.Row>
         </Table.Header>
 
