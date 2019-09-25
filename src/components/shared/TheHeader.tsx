@@ -13,6 +13,10 @@ const TheHeader: React.FC = () => {
     currUserName()
   }, [])
 
+  const signOut = async () => {
+    await Auth.signOut()
+  }
+
   return (
     <Menu borderless pointing>
       <Menu.Item color='red' name='Tafalk! Admin'>
@@ -25,7 +29,10 @@ const TheHeader: React.FC = () => {
           Hello, {username}
         </Menu.Item>
         <Menu.Item>
-          <Button primary>LOGOUT</Button>
+          <Button
+            primary
+            onClick={signOut}
+            >LOGOUT</Button>
         </Menu.Item>
       </Menu.Menu>
     </Menu>
