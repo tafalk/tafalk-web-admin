@@ -1,17 +1,22 @@
 export const flagTableHeaders = [
   { text: 'Id', value: 'id' },
+  { text: 'Content Type', value: 'contentType' },
   { text: 'Content Id', value: 'contentId' },
-  { text: 'Flag Category', value: 'category' },
-  { text: 'Flag Details', value: 'details' },
-  { text: 'Status', value: 'status' },
-  { text: 'Created', value: 'created' },
-  { text: 'LastChange', value: 'lastChange' }
+  { text: 'Flagger User Id', value: 'flaggerUserId' },
+  { text: 'Category', value: 'category' },
+  { text: 'Type', value: 'type' },
+  { text: 'Detail', value: 'detail' },
+  { text: 'Reviewer Id', value: 'reviewerUserId' },
+  { text: 'Status', value: 'reviewStatus' },
+  { text: 'Note', value: 'reviewNote' },
+  { text: 'Created', value: 'createTime' },
+  { text: 'Last Updated', value: 'lastUpdateTime' }
 ]
 
-export const uncloggerHintTableHeaders = [
+export const uncloggerPromptTableHeaders = [
   { text: 'Id', value: 'id' },
-  { text: 'Hint Category', value: 'category' },
-  { text: 'Text', value: 'details' },
+  { text: 'Category', value: 'category' },
+  { text: 'Body', value: 'body' },
   { text: 'Creator', value: 'creator' },
   { text: 'Created', value: 'created' }
 ]

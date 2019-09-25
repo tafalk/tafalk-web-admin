@@ -1,7 +1,18 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
+import { Auth } from 'aws-amplify'
 import { Header, Button, Menu } from 'semantic-ui-react'
 
 const TheHeader: React.FC = () => {
+  // username hook
+  const [username, setUsername] = useState(null)
+  useEffect(() => {
+    const currUserName = async () => {
+      const currUser = await Auth.currentAuthenticatedUser()
+      setUsername(currUser.username)
+    }
+    currUserName()
+  }, [])
+
   return (
     <Menu borderless pointing>
       <Menu.Item color='red' name='Tafalk! Admin'>
@@ -9,10 +20,14 @@ const TheHeader: React.FC = () => {
           Tafalk! Admin
         </Header>
       </Menu.Item>
-
-      <Menu.Item position='right'>
-        <Button primary>LOGIN</Button>
-      </Menu.Item>
+      <Menu.Menu position='right'>
+        <Menu.Item>
+          Hello, {username}
+        </Menu.Item>
+        <Menu.Item>
+          <Button primary>LOGOUT</Button>
+        </Menu.Item>
+      </Menu.Menu>
     </Menu>
   )
 }

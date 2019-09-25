@@ -1,6 +1,6 @@
 import TafalkAdminHomeView from './views/Home'
 import TafalkAdminFlagsView from './views/Flags'
-import TafalkAdminUncloggerHintsView from './views/UncloggerHints'
+import TafalkAdminUncloggerHintsView from './views/UncloggerPrompts'
 
 const router = [
   {
