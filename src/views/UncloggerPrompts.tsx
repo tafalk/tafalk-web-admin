@@ -1,8 +1,20 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
+import { API, graphqlOperation } from 'aws-amplify'
 import { Table, Header } from 'semantic-ui-react'
 import { uncloggerPromptTableHeaders } from '../utils/tableUtils'
+import { ListUncloggerPrompts } from '../graphql/UncloggerPrompt'
 
 const UncloggerPromptsView: React.FC = () => {
+    // Hooks
+    const [prompts, setPrompts] = useState([])
+
+    useEffect(() => {
+      (async function loadPrompts() {
+        const result = await API.graphql(graphqlOperation(ListUncloggerPrompts))
+        console.log(JSON.stringify(result))
+        // setPrompts(result.data);
+      })()
+    }, [])
   return (
     <div>
       <Header as='h2' color='grey'>
