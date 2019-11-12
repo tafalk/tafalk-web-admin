@@ -8,6 +8,9 @@ export const ListUncloggerPrompts = gql`
         id
         category
         body
+        creatorUserId
+        createTime
+      }
       nextToken
     }
   }

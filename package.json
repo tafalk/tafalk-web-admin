@@ -27,6 +27,10 @@
   },
   "eslintConfig": {
     "root": true,
+    "env": {
+      "node": true,
+      "es6": true
+    },
     "parser": "@typescript-eslint/parser",
     "extends": [
       "react-app",
@@ -56,7 +60,8 @@
       "sourceType": "module",
       "ecmaFeatures": {
         "jsx": true
-      }
+      },
+      "project": "./tsconfig.json"
     }
   },
   "browserslist": {

@@ -5,20 +5,23 @@ import { uncloggerPromptTableHeaders } from '../utils/tableUtils'
 import { ListUncloggerPrompts } from '../graphql/UncloggerPrompt'
 
 const UncloggerPromptsView: React.FC = () => {
-    // Hooks
-    const [prompts, setPrompts] = useState([])
-
-    useEffect(() => {
-      (async function loadPrompts() {
-        const result = await API.graphql(graphqlOperation(ListUncloggerPrompts))
-        console.log(JSON.stringify(result))
-        // setPrompts(result.data);
-      })()
-    }, [])
+  // Hooks
+  const [prompts, setPrompts] = useState([])
+  useEffect(() => {
+    (async () =>{
+      try {
+        const rawResult: any = await API.graphql(graphqlOperation(ListUncloggerPrompts))
+        const promptsResult = ((rawResult || {}).data || {}).listUncloggerPrompts
+        setPrompts(promptsResult.items)
+      } catch (err) {
+        console.log(JSON.stringify(err))
+      }
+    })()
+  }, [])
   return (
     <div>
       <Header as='h2' color='grey'>
-        Flags
+        Unclogger Prompts
       </Header>
       <Table color='olive'>
         <Table.Header>
@@ -34,13 +37,17 @@ const UncloggerPromptsView: React.FC = () => {
         </Table.Header>
 
         <Table.Body>
-          <Table.Row>
-            <Table.Cell>1</Table.Cell>
-            <Table.Cell>1</Table.Cell>
-            <Table.Cell>Spam</Table.Cell>
-            <Table.Cell></Table.Cell>
-            <Table.Cell>RESOLVED</Table.Cell>
-          </Table.Row>
+          {prompts.map((p: any) => (
+              <Table.Row
+                key={p.id}
+              >
+                <Table.Cell>{p.id}</Table.Cell>
+                <Table.Cell>{p.category}</Table.Cell>
+                <Table.Cell>{p.body}</Table.Cell>
+                <Table.Cell>{p.creatorUserId}</Table.Cell>
+                <Table.Cell>{p.createTime}</Table.Cell>
+              </Table.Row>
+            ))}
         </Table.Body>
       </Table>
     </div>
