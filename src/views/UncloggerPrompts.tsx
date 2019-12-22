@@ -3,19 +3,18 @@ import { API, graphqlOperation } from 'aws-amplify'
 import { Table, Header } from 'semantic-ui-react'
 import { uncloggerPromptTableHeaders } from '../utils/tableUtils'
 import { ListUncloggerPrompts } from '../graphql/UncloggerPrompt'
+import { UncloggerPromptType } from '../types'
 
 const UncloggerPromptsView: React.FC = () => {
   // Hooks
   const [prompts, setPrompts] = useState([])
   useEffect(() => {
-    ;(async () => {
+    ;(async (): Promise<void> => {
       try {
-        const rawResult: any = await API.graphql(
+        const { data }: any = await API.graphql(
           graphqlOperation(ListUncloggerPrompts)
         )
-        const promptsResult = ((rawResult || {}).data || {})
-          .listUncloggerPrompts
-        setPrompts(promptsResult.items)
+        setPrompts(data?.listUncloggerPrompts?.items)
       } catch (err) {
         console.log(JSON.stringify(err))
       }
@@ -36,7 +35,7 @@ const UncloggerPromptsView: React.FC = () => {
         </Table.Header>
 
         <Table.Body>
-          {prompts.map((p: any) => (
+          {prompts.map((p: UncloggerPromptType) => (
             <Table.Row key={p.id}>
               <Table.Cell>{p.id}</Table.Cell>
               <Table.Cell>{p.category}</Table.Cell>
