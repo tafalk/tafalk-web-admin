@@ -5,18 +5,14 @@ import { flagTableHeaders } from '../utils/tableUtils'
 const FlagsView: React.FC = () => {
   return (
     <div>
-      <Header as='h2' color='grey'>
+      <Header as="h2" color="grey">
         Flags
       </Header>
-      <Table color='olive'>
+      <Table color="olive">
         <Table.Header>
           <Table.Row>
             {flagTableHeaders.map((headerObj, index) => (
-              <Table.HeaderCell
-                key={index}
-              >
-                {headerObj.text}
-              </Table.HeaderCell>
+              <Table.HeaderCell key={index}>{headerObj.text}</Table.HeaderCell>
             ))}
           </Table.Row>
         </Table.Header>
