@@ -3,18 +3,23 @@ import { API, graphqlOperation } from 'aws-amplify'
 import { Table, Header } from 'semantic-ui-react'
 import { uncloggerPromptTableHeaders } from '../utils/tableUtils'
 import { ListUncloggerPrompts } from '../graphql/UncloggerPrompt'
-import { UncloggerPromptType } from '../types'
+import {
+  AppSyncUncloggerPrompt,
+  AppSyncListUncloggerPromptsResultData
+} from '../types/appsync/uncloggerPrompt'
 
 const UncloggerPromptsView: React.FC = () => {
   // Hooks
-  const [prompts, setPrompts] = useState([])
+  const [prompts, setPrompts] = useState<AppSyncUncloggerPrompt[]>([])
   useEffect(() => {
     ;(async (): Promise<void> => {
       try {
-        const { data }: any = await API.graphql(
+        const result = (await API.graphql(
           graphqlOperation(ListUncloggerPrompts)
-        )
-        setPrompts(data?.listUncloggerPrompts?.items)
+        )) as {
+          data: AppSyncListUncloggerPromptsResultData
+        }
+        setPrompts(result.data.listUncloggerPrompts.items)
       } catch (err) {
         console.log(JSON.stringify(err))
       }
@@ -35,13 +40,14 @@ const UncloggerPromptsView: React.FC = () => {
         </Table.Header>
 
         <Table.Body>
-          {prompts.map((p: UncloggerPromptType) => (
+          {prompts.map((p: AppSyncUncloggerPrompt) => (
             <Table.Row key={p.id}>
               <Table.Cell>{p.id}</Table.Cell>
               <Table.Cell>{p.category}</Table.Cell>
               <Table.Cell>{p.body}</Table.Cell>
               <Table.Cell>{p.creatorUserId}</Table.Cell>
               <Table.Cell>{p.createTime}</Table.Cell>
+              <Table.Cell>{p.approveTime}</Table.Cell>
             </Table.Row>
           ))}
         </Table.Body>
