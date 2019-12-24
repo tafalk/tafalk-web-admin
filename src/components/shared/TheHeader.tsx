@@ -19,20 +19,17 @@ const TheHeader: React.FC = () => {
 
   return (
     <Menu borderless pointing>
-      <Menu.Item color='red' name='Tafalk! Admin'>
-        <Header as='h2' color='red'>
+      <Menu.Item color="red" name="Tafalk! Admin">
+        <Header as="h2" color="red">
           Tafalk! Admin
         </Header>
       </Menu.Item>
-      <Menu.Menu position='right'>
+      <Menu.Menu position="right">
+        <Menu.Item>Hello, {username}</Menu.Item>
         <Menu.Item>
-          Hello, {username}
-        </Menu.Item>
-        <Menu.Item>
-          <Button
-            primary
-            onClick={signOut}
-            >LOGOUT</Button>
+          <Button negative onClick={signOut}>
+            LOGOUT
+          </Button>
         </Menu.Item>
       </Menu.Menu>
     </Menu>

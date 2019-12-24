@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react'
 import { API, graphqlOperation } from 'aws-amplify'
-import { Table, Header } from 'semantic-ui-react'
+import { Table, Header, Button, Icon } from 'semantic-ui-react'
 import { uncloggerPromptTableHeaders } from '../utils/tableUtils'
 import { ListUncloggerPrompts } from '../graphql/UncloggerPrompt'
 import {
   AppSyncUncloggerPrompt,
   AppSyncListUncloggerPromptsResultData
 } from '../types/appsync/uncloggerPrompt'
+import UpsertUncloggerPromptDialog from '../components/uncloggerPrompt/dialog/UpsertUncloggerPromptDialog'
 
 const UncloggerPromptsView: React.FC = () => {
   // Hooks
+  const [isUpsertDialogVisible, setIsUpsertDialogVisible] = useState(false)
   const [prompts, setPrompts] = useState<AppSyncUncloggerPrompt[]>([])
   useEffect(() => {
     ;(async (): Promise<void> => {
@@ -25,11 +27,24 @@ const UncloggerPromptsView: React.FC = () => {
       }
     })()
   }, [])
+  // Render
   return (
     <div>
       <Header as="h2" color="grey">
+        {/* Title */}
         Unclogger Prompts
+        {/* Create New Button */}
+        <Button
+          positive
+          floated="right"
+          onClick={(): void => setIsUpsertDialogVisible(true)}
+        >
+          <Icon name="plus" />
+          &nbsp;New
+        </Button>
       </Header>
+
+      {/* Table */}
       <Table color="olive">
         <Table.Header>
           <Table.Row>
@@ -52,6 +67,8 @@ const UncloggerPromptsView: React.FC = () => {
           ))}
         </Table.Body>
       </Table>
+      {/* Upsert Dialog */}
+      {isUpsertDialogVisible && <UpsertUncloggerPromptDialog />}
     </div>
   )
 }
