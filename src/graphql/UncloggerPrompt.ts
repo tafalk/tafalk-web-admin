@@ -23,7 +23,7 @@ export const CreateUncloggerPrompt = gql`
     $category: String!
     $body: String!
     $language: String
-    $state: String
+    $status: String
     $creatorUserId: String
     $createTime: String
   ) {
@@ -32,7 +32,7 @@ export const CreateUncloggerPrompt = gql`
         category: $category
         body: $body
         language: $language
-        state: $state
+        status: $status
         creatorUserId: $creatorUserId
         createTime: $createTime
       }
@@ -48,7 +48,7 @@ export const UpdateUncloggerPrompt = gql`
     $category: String
     $body: String
     $language: String
-    $state: String
+    $status: String
     $approverUserId: String
     $approveTime: String
   ) {
@@ -58,7 +58,7 @@ export const UpdateUncloggerPrompt = gql`
         category: $category
         body: $body
         language: $language
-        state: $state
+        status: $status
         approverUserId: $approverUserId
         approveTime: $approveTime
       }

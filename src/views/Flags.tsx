@@ -1,35 +1,40 @@
 import React from 'react'
-import { Table, Header } from 'semantic-ui-react'
+import Container from 'react-bootstrap/Container'
+import Row from 'react-bootstrap/Row'
+import Table from 'react-bootstrap/Table'
 import { flagTableHeaders } from '../utils/tableUtils'
 
 const FlagsView: React.FC = () => {
   return (
-    <div>
-      <Header as="h2" color="grey">
-        Flags
-      </Header>
-      <Table color="olive">
-        <Table.Header>
-          <Table.Row>
-            {flagTableHeaders.map((headerObj, index) => (
-              <Table.HeaderCell key={index}>{headerObj.text}</Table.HeaderCell>
-            ))}
-          </Table.Row>
-        </Table.Header>
-
-        <Table.Body>
-          <Table.Row>
-            <Table.Cell>1</Table.Cell>
-            <Table.Cell>1</Table.Cell>
-            <Table.Cell>Spam</Table.Cell>
-            <Table.Cell></Table.Cell>
-            <Table.Cell>RESOLVED</Table.Cell>
-            <Table.Cell>2019-09-19</Table.Cell>
-            <Table.Cell>2019-09-20</Table.Cell>
-          </Table.Row>
-        </Table.Body>
-      </Table>
-    </div>
+    <Container fluid>
+      <Row>
+        {/* Title */}
+        <h2 style={{ color: 'grey' }}>Flags</h2>
+      </Row>
+      <Row>
+        {/* Table */}
+        <Table striped bordered hover>
+          <thead>
+            <tr>
+              {flagTableHeaders.map((headerObj, index) => (
+                <th key={index}>{headerObj.text}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>1</td>
+              <td>Spam</td>
+              <td></td>
+              <td>RESOLVED</td>
+              <td>2019-09-19</td>
+              <td>2019-09-20</td>
+            </tr>
+          </tbody>
+        </Table>
+      </Row>
+    </Container>
   )
 }
 

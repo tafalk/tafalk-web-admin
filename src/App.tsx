@@ -1,11 +1,12 @@
 import React from 'react'
 import { BrowserRouter as Router, Route } from 'react-router-dom'
-import { Grid } from 'semantic-ui-react'
+import Container from 'react-bootstrap/Container'
+import Row from 'react-bootstrap/Row'
+import Col from 'react-bootstrap/Col'
 
 import { withAuthenticator, SignIn } from 'aws-amplify-react'
 import Amplify from 'aws-amplify'
 import { GoogleRecaptchaV3Config, AwsConfig } from './config'
-
 import TafalkWebAdminHeader from './components/shared/TheHeader'
 import TafalkRoutingMenu from './components/shared/TheRoutingMenu'
 import router from './router'
@@ -17,27 +18,32 @@ const App: React.FC = () => {
     <Router>
       <div>
         <TafalkWebAdminHeader />
-        <Grid padded>
-          <Grid.Column width={3}>
-            <TafalkRoutingMenu />
-          </Grid.Column>
-          <Grid.Column stretched width={13}>
-            {router.map((route, index) => (
-              <Route
-                key={index}
-                path={route.path}
-                exact={route.exact}
-                component={route.component}
-              />
-            ))}
-          </Grid.Column>
-        </Grid>
+        <Container fluid>
+          <Row>
+            {/* Navigation Bar */}
+            <Col xs={2}>
+              <TafalkRoutingMenu />
+            </Col>
+            {/* Navigation Bar */}
+            <Col>
+              {router.map((route, index) => (
+                <Route
+                  key={index}
+                  path={route.path}
+                  exact={route.exact}
+                  component={route.component}
+                />
+              ))}
+            </Col>
+          </Row>
+        </Container>
       </div>
     </Router>
   )
 }
 
-export default withAuthenticator(App,
+export default withAuthenticator(
+  App,
   false, // includeGreetings
-  [ <SignIn/> ] // authenticatorComponents
+  [<SignIn />] // authenticatorComponents
 )

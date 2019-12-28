@@ -1,38 +1,39 @@
 import React, { useState, useEffect } from 'react'
 import { Auth } from 'aws-amplify'
-import { Header, Button, Menu } from 'semantic-ui-react'
+import { Link } from 'react-router-dom'
+import Navbar from 'react-bootstrap/Navbar'
+import Button from 'react-bootstrap/Button'
 
 const TheHeader: React.FC = () => {
   // username hook
   const [username, setUsername] = useState(null)
   useEffect(() => {
-    const currUserName = async () => {
+    const currUserName = async (): Promise<void> => {
       const currUser = await Auth.currentAuthenticatedUser()
       setUsername(currUser.username)
     }
     currUserName()
   }, [])
 
-  const signOut = async () => {
+  const signOut = async (): Promise<void> => {
     await Auth.signOut()
   }
 
   return (
-    <Menu borderless pointing>
-      <Menu.Item color="red" name="Tafalk! Admin">
-        <Header as="h2" color="red">
-          Tafalk! Admin
-        </Header>
-      </Menu.Item>
-      <Menu.Menu position="right">
-        <Menu.Item>Hello, {username}</Menu.Item>
-        <Menu.Item>
-          <Button negative onClick={signOut}>
-            LOGOUT
-          </Button>
-        </Menu.Item>
-      </Menu.Menu>
-    </Menu>
+    <Navbar>
+      <Navbar.Brand>
+        <Link to="/">
+          <h3 style={{ color: 'red' }}>Tafalk! Admin</h3>
+        </Link>
+      </Navbar.Brand>
+      <Navbar.Toggle />
+      <Navbar.Collapse className="justify-content-end">
+        <Navbar.Text>Hello, {username}</Navbar.Text>&emsp;
+        <Button variant="danger" onClick={signOut}>
+          LOGOUT
+        </Button>
+      </Navbar.Collapse>
+    </Navbar>
   )
 }
 

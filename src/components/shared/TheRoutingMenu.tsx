@@ -1,21 +1,17 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
-import { Menu } from 'semantic-ui-react'
+import Nav from 'react-bootstrap/Nav'
 
 const TheRoutingMenu: React.FC = () => {
   return (
-    <Menu fluid vertical tabular>
-      <Menu.Item
-        name='flags'
-        as={NavLink}
-        to='/flags'
-      />
-      <Menu.Item
-        name='uncloggerHints'
-        as={NavLink}
-        to='/uncloggerHints'
-      />
-    </Menu>
+    <Nav defaultActiveKey="/home" className="flex-column">
+      <Nav.Link as={NavLink} to="/flags">
+        Flags
+      </Nav.Link>
+      <Nav.Link as={NavLink} to="/uncloggerHints">
+        Unclogger Hints
+      </Nav.Link>
+    </Nav>
   )
 }
 
