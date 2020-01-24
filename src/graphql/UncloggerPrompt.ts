@@ -2,14 +2,27 @@ import gql from 'graphql-tag'
 
 // Get
 export const ListUncloggerPrompts = gql`
-  query ListUncloggerPrompts($limit: Int, $offset: Int) {
-    listUncloggerPrompts(limit: $limit, offset: $offset) {
+  query ListUncloggerPrompts($limit: Int, $offset: Int, $searchText: String) {
+    listUncloggerPrompts(
+      limit: $limit
+      offset: $offset
+      searchText: $searchText
+    ) {
       id
       category
       body
       creatorUserId
       createTime
+      status
       reviewTime
+    }
+  }
+`
+
+export const CountUncloggerPrompts = gql`
+  query CountUncloggerPrompts($searchText: String) {
+    countUncloggerPrompts(searchText: $searchText) {
+      count
     }
   }
 `

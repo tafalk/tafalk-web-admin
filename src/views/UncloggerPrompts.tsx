@@ -13,11 +13,16 @@ import {
   uncloggerPromptTableHeaders,
   itemsPerPageOptions
 } from '../utils/tableUtils'
-import { ListUncloggerPrompts } from '../graphql/UncloggerPrompt'
+import { uncloggerPromptStatuses } from '../utils/constants'
+import {
+  ListUncloggerPrompts,
+  CountUncloggerPrompts
+} from '../graphql/UncloggerPrompt'
 import TafalkAdminUpsertUncloggerPromptModal from '../components/uncloggerPrompt/UpsertUncloggerPromptModal'
 import {
   AppSyncUncloggerPrompt,
-  AppSyncListUncloggerPromptsResultData
+  AppSyncListUncloggerPromptsResultData,
+  AppSyncCountUncloggerPromptsResultData
 } from '../types/appsync/uncloggerPrompt'
 
 const UncloggerPromptsView: React.FC = () => {
@@ -26,14 +31,19 @@ const UncloggerPromptsView: React.FC = () => {
   const [activeTablePage, setActiveTablePage] = useState<number>(1)
   const [activeItemsPerPage, setActiveItemsPerPage] = useState<number>(5)
   const [prompts, setPrompts] = useState<AppSyncUncloggerPrompt[]>([])
+  const [totalPromptCount, setTotalPromptCount] = useState<number>(0)
   useEffect(() => {
     ;(async (): Promise<void> => {
       try {
-        const result = (await API.graphql(
-          graphqlOperation(ListUncloggerPrompts)
-        )) as {
-          data: AppSyncListUncloggerPromptsResultData
-        }
+        const [result, countResult] = await Promise.all([
+          (await API.graphql(graphqlOperation(ListUncloggerPrompts))) as {
+            data: AppSyncListUncloggerPromptsResultData
+          },
+          (await API.graphql(graphqlOperation(CountUncloggerPrompts))) as {
+            data: AppSyncCountUncloggerPromptsResultData
+          }
+        ])
+        setTotalPromptCount(countResult.data.countUncloggerPrompts)
         setPrompts(result.data.listUncloggerPrompts)
       } catch (err) {
         console.log(JSON.stringify(err))
@@ -43,8 +53,8 @@ const UncloggerPromptsView: React.FC = () => {
 
   // Functions
   const pageCount = (): number => {
-    return prompts.length && prompts.length > 0
-      ? Math.ceil(prompts.length / activeItemsPerPage)
+    return totalPromptCount > 0
+      ? Math.ceil(totalPromptCount / activeItemsPerPage)
       : 0
   }
   const activeTablePageChanged = (p: number): void => {
@@ -53,6 +63,21 @@ const UncloggerPromptsView: React.FC = () => {
   const itemsPerPageChanged = (e: React.SyntheticEvent): void => {
     const currTarget = e.currentTarget as HTMLInputElement
     setActiveItemsPerPage(parseInt(currTarget.value))
+  }
+  const statusFilterChanged = (e: React.SyntheticEvent): void => {
+    const currTarget = e.currentTarget as HTMLInputElement
+    // TODO: Trigger a render
+    // setActiveItemsPerPage(parseInt(currTarget.value))
+  }
+  const searchTextChanged = (e: React.SyntheticEvent): void => {
+    const currTarget = e.currentTarget as HTMLInputElement
+    // TODO: Trigger a render
+    // setActiveItemsPerPage(parseInt(currTarget.value))
+  }
+  const rowClicked = (e: React.SyntheticEvent): void => {
+    const currTarget = e.currentTarget as HTMLInputElement
+    // TODO: Trigger a render
+    // setActiveItemsPerPage(parseInt(currTarget.value))
   }
 
   // Render
@@ -72,6 +97,33 @@ const UncloggerPromptsView: React.FC = () => {
           </Button>
         </Col>
       </Row>
+      {/* Filters */}
+      <Row>
+        <Col sm={{ span: 4, offset: 4 }}>
+          {/* Status */}
+          <FormControl
+            as="select"
+            aria-label="StatusFilter"
+            aria-describedby="statusFilterLabel"
+            onChange={(e): void => statusFilterChanged(e)}
+          >
+            {uncloggerPromptStatuses.map((o: string) => (
+              <option key={o}>{o}</option>
+            ))}
+          </FormControl>
+        </Col>
+        <Col sm={{ span: 4 }}>
+          {/* Search */}
+          <FormControl
+            placeholder="Search"
+            aria-label="Search"
+            aria-describedby="searchLabel"
+            onChange={(e: React.SyntheticEvent): void => {
+              return searchTextChanged(e)
+            }}
+          ></FormControl>
+        </Col>
+      </Row>
       <Row>
         {/* Table */}
         <Table striped bordered hover>
@@ -84,12 +136,13 @@ const UncloggerPromptsView: React.FC = () => {
           </thead>
           <tbody>
             {prompts.map((p: AppSyncUncloggerPrompt) => (
-              <tr key={p.id}>
+              <tr key={p.id} onClick={(e): void => rowClicked(e)}>
                 <td>{p.id}</td>
                 <td>{p.category}</td>
                 <td>{p.body}</td>
                 <td>{p.creatorUserId}</td>
                 <td>{p.createTime}</td>
+                <td>{p.status}</td>
                 <td>{p.reviewTime}</td>
               </tr>
             ))}
@@ -119,7 +172,7 @@ const UncloggerPromptsView: React.FC = () => {
         </Col>
         {/* Page */}
         <Pagination>
-          {Array.from({ length: pageCount() }, (x, i) => i + 1).map(
+          {Array.from({ length: pageCount() }, (_, i) => i + 1).map(
             (p: number) => (
               <Pagination.Item
                 key={p}

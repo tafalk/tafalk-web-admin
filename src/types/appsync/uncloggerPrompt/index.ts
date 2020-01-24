@@ -5,6 +5,10 @@ export type AppSyncListUncloggerPromptsResultData = {
   listUncloggerPrompts: AppSyncUncloggerPrompt[]
 }
 
+export type AppSyncCountUncloggerPromptsResultData = {
+  countUncloggerPrompts: number
+}
+
 // Create
 export type AppSyncCreateUncloggerPromptResultData = {
   createUncloggerPrompt: {
@@ -17,7 +21,7 @@ export type AppSyncUncloggerPrompt = {
   category: string
   body: string
   language: string
-  state: string
+  status: string
   creatorUserId: string
   creatorUser: AppSyncUser
   reviewerUserId: string
