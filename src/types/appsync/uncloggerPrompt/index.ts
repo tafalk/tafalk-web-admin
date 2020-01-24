@@ -2,9 +2,13 @@ import { AppSyncUser } from '../user'
 
 // ListUncloggerPrompts
 export type AppSyncListUncloggerPromptsResultData = {
-  listUncloggerPrompts: {
-    items: AppSyncUncloggerPrompt[]
-    nextToken: string
+  listUncloggerPrompts: AppSyncUncloggerPrompt[]
+}
+
+// Create
+export type AppSyncCreateUncloggerPromptResultData = {
+  createUncloggerPrompt: {
+    id: string
   }
 }
 
@@ -16,8 +20,9 @@ export type AppSyncUncloggerPrompt = {
   state: string
   creatorUserId: string
   creatorUser: AppSyncUser
-  approverUserId: string
-  approverUser: AppSyncUser
+  reviewerUserId: string
+  reviewerUser: AppSyncUser
+  reviewNote: string
   createTime: string
-  approveTime: string
+  reviewTime: string
 }

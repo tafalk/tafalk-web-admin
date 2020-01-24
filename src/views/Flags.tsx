@@ -1,6 +1,7 @@
 import React from 'react'
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
+import Breadcrumb from 'react-bootstrap/Breadcrumb'
 import Table from 'react-bootstrap/Table'
 import { flagTableHeaders } from '../utils/tableUtils'
 
@@ -9,7 +10,9 @@ const FlagsView: React.FC = () => {
     <Container fluid>
       <Row>
         {/* Title */}
-        <h2 style={{ color: 'grey' }}>Flags</h2>
+        <Breadcrumb>
+          <Breadcrumb.Item active>Flags</Breadcrumb.Item>
+        </Breadcrumb>
       </Row>
       <Row>
         {/* Table */}

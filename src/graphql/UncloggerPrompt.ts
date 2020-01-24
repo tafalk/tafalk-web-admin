@@ -2,17 +2,14 @@ import gql from 'graphql-tag'
 
 // Get
 export const ListUncloggerPrompts = gql`
-  query ListUncloggerPrompts($limit: Int, $nextToken: String) {
-    listUncloggerPrompts(first: $limit, after: $nextToken) {
-      items {
-        id
-        category
-        body
-        creatorUserId
-        createTime
-        approveTime
-      }
-      nextToken
+  query ListUncloggerPrompts($limit: Int, $offset: Int) {
+    listUncloggerPrompts(limit: $limit, offset: $offset) {
+      id
+      category
+      body
+      creatorUserId
+      createTime
+      reviewTime
     }
   }
 `
@@ -20,12 +17,11 @@ export const ListUncloggerPrompts = gql`
 // Create
 export const CreateUncloggerPrompt = gql`
   mutation CreateUncloggerPrompt(
-    $category: String!
+    $category: UncloggerPromptCategory!
     $body: String!
-    $language: String
-    $status: String
+    $language: Language
+    $status: ApprovalStatus
     $creatorUserId: String
-    $createTime: String
   ) {
     createUncloggerPrompt(
       input: {
@@ -34,7 +30,6 @@ export const CreateUncloggerPrompt = gql`
         language: $language
         status: $status
         creatorUserId: $creatorUserId
-        createTime: $createTime
       }
     ) {
       id
@@ -49,8 +44,7 @@ export const UpdateUncloggerPrompt = gql`
     $body: String
     $language: String
     $status: String
-    $approverUserId: String
-    $approveTime: String
+    $reviewerUserId: String
   ) {
     createUncloggerPrompt(
       input: {
@@ -59,8 +53,7 @@ export const UpdateUncloggerPrompt = gql`
         body: $body
         language: $language
         status: $status
-        approverUserId: $approverUserId
-        approveTime: $approveTime
+        reviewerUserId: $reviewerUserId
       }
     ) {
       id

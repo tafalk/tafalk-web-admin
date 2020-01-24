@@ -13,6 +13,7 @@ import {
 import { UncloggerPromptModalPropType } from '../../types/prop'
 import { AppSyncListEnumValuesResultData } from '../../types/appsync/introspection'
 import { GetCurrAuthUserId } from '../../utils/functions'
+import { AppSyncCreateUncloggerPromptResultData } from '../../types/appsync/uncloggerPrompt'
 
 const UpsertUncloggerPromptModal: React.FC<UncloggerPromptModalPropType> = (
   props: UncloggerPromptModalPropType
@@ -27,7 +28,7 @@ const UpsertUncloggerPromptModal: React.FC<UncloggerPromptModalPropType> = (
   const [currAuthUserId, setCurrAuthUserId] = useState<string | undefined>(
     undefined
   )
-  const [formData, setFormData] = useState({
+  const [{ category, body, language, status }, setFormData] = useState({
     category: initialData?.category,
     body: initialData?.body,
     language: initialData?.language,
@@ -40,21 +41,13 @@ const UpsertUncloggerPromptModal: React.FC<UncloggerPromptModalPropType> = (
   const [approvalStatusOptions, setApprovalStatusOptions] = useState<string[]>(
     []
   )
-  // Load Authenticated User Name
+  // Load Authenticated User and Select Options
   useEffect(() => {
     ;(async (): Promise<void> => {
       try {
+        // Load Authenticated User Name
         const currAuthUserId = await GetCurrAuthUserId()
         setCurrAuthUserId(currAuthUserId)
-      } catch (err) {
-        console.log(JSON.stringify(err))
-      }
-    })()
-  })
-  // Load Categories
-  useEffect(() => {
-    ;(async (): Promise<void> => {
-      try {
         // Send the requests
         const categoryOptionsRequest = API.graphql(
           graphqlOperation(ListEnumValues, {
@@ -102,17 +95,23 @@ const UpsertUncloggerPromptModal: React.FC<UncloggerPromptModalPropType> = (
   }, [categoryOptions])
 
   // functions
-  const save = async (): Promise<void> => {
+  const onChange = (e: React.SyntheticEvent): void => {
+    const { name, value } = e.target as HTMLInputElement
+    setFormData(prevState => ({ ...prevState, [name]: value }))
+  }
+  const create = async (): Promise<void> => {
     try {
-      setFormData(formData)
-      await API.graphql(
+      const result = (await API.graphql(
         graphqlOperation(CreateUncloggerPrompt, {
-          category: formData.category,
-          body: formData.body,
-          language: formData.language,
+          category: category,
+          body: body,
+          language: language,
           creatorUserId: currAuthUserId
         })
-      )
+      )) as {
+        data: AppSyncCreateUncloggerPromptResultData
+      }
+      console.log(JSON.stringify(result))
       onHide()
     } catch (err) {
       console.log(JSON.stringify(err))
@@ -120,7 +119,6 @@ const UpsertUncloggerPromptModal: React.FC<UncloggerPromptModalPropType> = (
   }
   const reject = async (): Promise<void> => {
     try {
-      setFormData(formData)
       // TODO: Implement Logic
       onHide()
     } catch (err) {
@@ -129,7 +127,6 @@ const UpsertUncloggerPromptModal: React.FC<UncloggerPromptModalPropType> = (
   }
   const approve = async (): Promise<void> => {
     try {
-      setFormData(formData)
       // TODO: Implement Logic
       onHide()
     } catch (err) {
@@ -149,9 +146,16 @@ const UpsertUncloggerPromptModal: React.FC<UncloggerPromptModalPropType> = (
           {/* Category */}
           <Form.Group controlId="category">
             <Form.Label>Category</Form.Label>
-            <Form.Control as="select" readOnly={!isNew}>
-              {categoryOptions.map((o: string) => (
-                <option key={o}>{o}</option>
+            <Form.Control
+              value={category}
+              as="select"
+              name="category"
+              readOnly={!isNew}
+              onChange={onChange}
+            >
+              <option></option>
+              {categoryOptions.map((c: string) => (
+                <option key={c}>{c}</option>
               ))}
             </Form.Control>
           </Form.Group>
@@ -163,23 +167,42 @@ const UpsertUncloggerPromptModal: React.FC<UncloggerPromptModalPropType> = (
               readOnly={!isNew}
               rows="3"
               placeholder="Enter Body"
-              value={formData.body}
+              value={body}
+              name="body"
+              onChange={onChange}
             />
           </Form.Group>
           {/* Language */}
           <Form.Group controlId="language">
             <Form.Label>Language</Form.Label>
-            <Form.Control as="select" readOnly={!isNew}>
-              {supportedLanguageOptions.map((c: string) => (
-                <option key={c}>{c}</option>
+            <Form.Control
+              value={language}
+              as="select"
+              name="language"
+              readOnly={!isNew}
+              onChange={onChange}
+            >
+              <option></option>
+              {supportedLanguageOptions.map((l: string) => (
+                <option key={l}>{l}</option>
               ))}
             </Form.Control>
           </Form.Group>
           {/* Status (visible if review) */}
           {!isNew ?? (
             <Form.Group controlId="status">
-              <Form.Label>Language</Form.Label>
-              <Form.Control as="select" value={formData.status} />
+              <Form.Label>Status</Form.Label>
+              <Form.Control
+                value={status}
+                as="select"
+                name="status"
+                onChange={onChange}
+              >
+                <option></option>
+                {approvalStatusOptions.map((s: string) => (
+                  <option key={s}>{s}</option>
+                ))}
+              </Form.Control>
             </Form.Group>
           )}
         </Form>
@@ -190,8 +213,8 @@ const UpsertUncloggerPromptModal: React.FC<UncloggerPromptModalPropType> = (
           Close
         </Button>
         {isNew ? (
-          <Button variant="primary" onClick={save}>
-            Save
+          <Button variant="primary" onClick={create}>
+            Create
           </Button>
         ) : (
           <>
