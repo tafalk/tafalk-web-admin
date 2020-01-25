@@ -13,7 +13,10 @@ import {
   uncloggerPromptTableHeaders,
   itemsPerPageOptions
 } from '../utils/tableUtils'
-import { uncloggerPromptStatuses } from '../utils/constants'
+import {
+  uncloggerPromptStatuses,
+  allPromptStatusesText
+} from '../utils/constants'
 import {
   ListUncloggerPrompts,
   CountUncloggerPrompts
@@ -28,18 +31,39 @@ import {
 const UncloggerPromptsView: React.FC = () => {
   // Hooks
   const [isUpsertDialogVisible, setIsUpsertDialogVisible] = useState(false)
-  const [activeTablePage, setActiveTablePage] = useState<number>(1)
-  const [activeItemsPerPage, setActiveItemsPerPage] = useState<number>(5)
+  const [statusFilter, setStatusFilter] = useState<string>('')
+  const [searchText, setSearchText] = useState<string>('')
+  const [tablePage, setTablePage] = useState<number>(1)
+  const [itemsPerPage, setItemsPerPage] = useState<number>(5)
   const [prompts, setPrompts] = useState<AppSyncUncloggerPrompt[]>([])
   const [totalPromptCount, setTotalPromptCount] = useState<number>(0)
+
   useEffect(() => {
     ;(async (): Promise<void> => {
       try {
         const [result, countResult] = await Promise.all([
-          (await API.graphql(graphqlOperation(ListUncloggerPrompts))) as {
+          (await API.graphql(
+            graphqlOperation(ListUncloggerPrompts, {
+              limit: itemsPerPage,
+              offset: tablePage - 1,
+              searchText,
+              status:
+                statusFilter !== allPromptStatusesText
+                  ? statusFilter
+                  : undefined
+            })
+          )) as {
             data: AppSyncListUncloggerPromptsResultData
           },
-          (await API.graphql(graphqlOperation(CountUncloggerPrompts))) as {
+          (await API.graphql(
+            graphqlOperation(CountUncloggerPrompts, {
+              searchText,
+              status:
+                statusFilter !== allPromptStatusesText
+                  ? statusFilter
+                  : undefined
+            })
+          )) as {
             data: AppSyncCountUncloggerPromptsResultData
           }
         ])
@@ -49,35 +73,34 @@ const UncloggerPromptsView: React.FC = () => {
         console.log(JSON.stringify(err))
       }
     })()
-  }, [])
+  }, [itemsPerPage, searchText, statusFilter, tablePage])
 
   // Functions
   const pageCount = (): number => {
-    return totalPromptCount > 0
-      ? Math.ceil(totalPromptCount / activeItemsPerPage)
-      : 0
+    return totalPromptCount > 0 ? Math.ceil(totalPromptCount / itemsPerPage) : 0
   }
-  const activeTablePageChanged = (p: number): void => {
-    setActiveTablePage(p)
+  const tablePageChanged = (p: number): void => {
+    setTablePage(p)
   }
-  const itemsPerPageChanged = (e: React.SyntheticEvent): void => {
+  const itemsPerPageChanged = async (
+    e: React.SyntheticEvent
+  ): Promise<void> => {
     const currTarget = e.currentTarget as HTMLInputElement
-    setActiveItemsPerPage(parseInt(currTarget.value))
+    setItemsPerPage(parseInt(currTarget.value))
   }
-  const statusFilterChanged = (e: React.SyntheticEvent): void => {
+  const statusFilterChanged = async (
+    e: React.SyntheticEvent
+  ): Promise<void> => {
     const currTarget = e.currentTarget as HTMLInputElement
-    // TODO: Trigger a render
-    // setActiveItemsPerPage(parseInt(currTarget.value))
+    setStatusFilter(currTarget.value)
   }
-  const searchTextChanged = (e: React.SyntheticEvent): void => {
+  const searchTextChanged = async (e: React.SyntheticEvent): Promise<void> => {
     const currTarget = e.currentTarget as HTMLInputElement
-    // TODO: Trigger a render
-    // setActiveItemsPerPage(parseInt(currTarget.value))
+    setSearchText(currTarget.value)
   }
   const rowClicked = (e: React.SyntheticEvent): void => {
     const currTarget = e.currentTarget as HTMLInputElement
-    // TODO: Trigger a render
-    // setActiveItemsPerPage(parseInt(currTarget.value))
+    console.log(currTarget)
   }
 
   // Render
@@ -105,8 +128,9 @@ const UncloggerPromptsView: React.FC = () => {
             as="select"
             aria-label="StatusFilter"
             aria-describedby="statusFilterLabel"
-            onChange={(e): void => statusFilterChanged(e)}
+            onChange={async (e): Promise<void> => await statusFilterChanged(e)}
           >
+            <option>{allPromptStatusesText}</option>
             {uncloggerPromptStatuses.map((o: string) => (
               <option key={o}>{o}</option>
             ))}
@@ -118,13 +142,14 @@ const UncloggerPromptsView: React.FC = () => {
             placeholder="Search"
             aria-label="Search"
             aria-describedby="searchLabel"
-            onChange={(e: React.SyntheticEvent): void => {
-              return searchTextChanged(e)
+            value={searchText}
+            onChange={async (e: React.SyntheticEvent): Promise<void> => {
+              await searchTextChanged(e)
             }}
           ></FormControl>
         </Col>
       </Row>
-      <Row>
+      <Row className="mt-3">
         {/* Table */}
         <Table striped bordered hover>
           <thead>
@@ -162,7 +187,9 @@ const UncloggerPromptsView: React.FC = () => {
               as="select"
               aria-label="ItemsPerPage"
               aria-describedby="itemsPerPageLabel"
-              onChange={(e): void => itemsPerPageChanged(e)}
+              onChange={async (e): Promise<void> =>
+                await itemsPerPageChanged(e)
+              }
             >
               {itemsPerPageOptions.map((o: number) => (
                 <option key={o}>{o}</option>
@@ -176,8 +203,8 @@ const UncloggerPromptsView: React.FC = () => {
             (p: number) => (
               <Pagination.Item
                 key={p}
-                active={p === activeTablePage}
-                onClick={(): void => activeTablePageChanged(p)}
+                active={p === tablePage}
+                onClick={(): void => tablePageChanged(p)}
               >
                 {p}
               </Pagination.Item>

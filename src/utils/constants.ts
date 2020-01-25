@@ -4,3 +4,5 @@ export const uncloggerPromptStatuses = [
   'Accepted',
   'OnHold'
 ]
+
+export const allPromptStatusesText = 'All'

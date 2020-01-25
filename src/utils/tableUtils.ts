@@ -21,5 +21,6 @@ export const uncloggerPromptTableHeaders = [
   { text: 'Body', value: 'body' },
   { text: 'Creator User Id', value: 'creatorUserId' },
   { text: 'Create Time', value: 'createTime' },
+  { text: 'Review Status', value: 'status' },
   { text: 'Review Time', value: 'reviewTime' }
 ]
