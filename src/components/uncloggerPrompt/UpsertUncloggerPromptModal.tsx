@@ -92,7 +92,7 @@ const UpsertUncloggerPromptModal: React.FC<UncloggerPromptModalPropType> = (
         console.log(JSON.stringify(err))
       }
     })()
-  }, [categoryOptions])
+  }, [show, categoryOptions])
 
   // functions
   const onChange = (e: React.SyntheticEvent): void => {

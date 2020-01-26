@@ -34,7 +34,7 @@ const UncloggerPromptsView: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<string>('')
   const [searchText, setSearchText] = useState<string>('')
   const [tablePage, setTablePage] = useState<number>(1)
-  const [itemsPerPage, setItemsPerPage] = useState<number>(5)
+  const [itemsPerPage, setItemsPerPage] = useState<number>(10)
   const [prompts, setPrompts] = useState<AppSyncUncloggerPrompt[]>([])
   const [totalPromptCount, setTotalPromptCount] = useState<number>(0)
 
@@ -48,7 +48,7 @@ const UncloggerPromptsView: React.FC = () => {
               offset: tablePage - 1,
               searchText,
               status:
-                statusFilter !== allPromptStatusesText
+                statusFilter && statusFilter !== allPromptStatusesText
                   ? statusFilter
                   : undefined
             })
@@ -59,7 +59,7 @@ const UncloggerPromptsView: React.FC = () => {
             graphqlOperation(CountUncloggerPrompts, {
               searchText,
               status:
-                statusFilter !== allPromptStatusesText
+                statusFilter && statusFilter !== allPromptStatusesText
                   ? statusFilter
                   : undefined
             })
@@ -67,8 +67,10 @@ const UncloggerPromptsView: React.FC = () => {
             data: AppSyncCountUncloggerPromptsResultData
           }
         ])
-        setTotalPromptCount(countResult.data.countUncloggerPrompts)
-        setPrompts(result.data.listUncloggerPrompts)
+        console.log('Result:')
+        console.log(result)
+        setTotalPromptCount(countResult.data.countUncloggerPrompts ?? 0)
+        setPrompts(result.data.listUncloggerPrompts ?? [])
       } catch (err) {
         console.log(JSON.stringify(err))
       }
@@ -98,7 +100,7 @@ const UncloggerPromptsView: React.FC = () => {
     const currTarget = e.currentTarget as HTMLInputElement
     setSearchText(currTarget.value)
   }
-  const rowClicked = (e: React.SyntheticEvent): void => {
+  const onEditClicked = (e: React.SyntheticEvent): void => {
     const currTarget = e.currentTarget as HTMLInputElement
     console.log(currTarget)
   }
@@ -151,7 +153,7 @@ const UncloggerPromptsView: React.FC = () => {
       </Row>
       <Row className="mt-3">
         {/* Table */}
-        <Table striped bordered hover>
+        <Table striped hover responsive="sm">
           <thead>
             <tr>
               {uncloggerPromptTableHeaders.map((headerObj, index) => (
@@ -161,14 +163,20 @@ const UncloggerPromptsView: React.FC = () => {
           </thead>
           <tbody>
             {prompts.map((p: AppSyncUncloggerPrompt) => (
-              <tr key={p.id} onClick={(e): void => rowClicked(e)}>
+              <tr key={p.id}>
+                <td
+                  style={{ cursor: 'pointer' }}
+                  onClick={(e): void => onEditClicked(e)}
+                >
+                  <span aria-label="Edit" role="image">
+                    ✏️
+                  </span>
+                </td>
                 <td>{p.id}</td>
+                <td>{p.status}</td>
                 <td>{p.category}</td>
                 <td>{p.body}</td>
                 <td>{p.creatorUserId}</td>
-                <td>{p.createTime}</td>
-                <td>{p.status}</td>
-                <td>{p.reviewTime}</td>
               </tr>
             ))}
           </tbody>

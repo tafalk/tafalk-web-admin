@@ -4,13 +4,14 @@ import { AppSyncGetUserByUsernameResultData } from '../types/appsync/user'
 
 export const GetCurrAuthUserId = async (): Promise<string> => {
   const currAuthUser = await Auth.currentAuthenticatedUser()
+
   const currAuthUserName = currAuthUser.username
-  const getUserIdByUserNameGraphqlReq = (await API.graphql(
+  const getUserIdByUserNameGraphqlResp = (await API.graphql(
     graphqlOperation(GetUserIdByUserName, { username: currAuthUserName })
   )) as {
     data: AppSyncGetUserByUsernameResultData
   }
   const getUserIdByUserNameGraphqlResult =
-    getUserIdByUserNameGraphqlReq.data.getUserByUsername
+    getUserIdByUserNameGraphqlResp.data.getUserByUsername
   return getUserIdByUserNameGraphqlResult.id
 }

@@ -8,8 +8,8 @@ const TheRoutingMenu: React.FC = () => {
       <Nav.Link as={NavLink} to="/flags">
         Flags
       </Nav.Link>
-      <Nav.Link as={NavLink} to="/uncloggerHints">
-        Unclogger Hints
+      <Nav.Link as={NavLink} to="/uncloggerPrompts">
+        Unclogger Prompts
       </Nav.Link>
     </Nav>
   )

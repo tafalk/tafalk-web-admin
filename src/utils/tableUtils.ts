@@ -1,4 +1,4 @@
-export const itemsPerPageOptions = [5, 10, 25, 50, 100]
+export const itemsPerPageOptions = [10, 25, 50, 100]
 
 export const flagTableHeaders = [
   { text: 'Id', value: 'id' },
@@ -16,11 +16,10 @@ export const flagTableHeaders = [
 ]
 
 export const uncloggerPromptTableHeaders = [
+  { text: '', value: 'action' },
   { text: 'Id', value: 'id' },
+  { text: 'Review Status', value: 'status' },
   { text: 'Category', value: 'category' },
   { text: 'Body', value: 'body' },
-  { text: 'Creator User Id', value: 'creatorUserId' },
-  { text: 'Create Time', value: 'createTime' },
-  { text: 'Review Status', value: 'status' },
-  { text: 'Review Time', value: 'reviewTime' }
+  { text: 'Creator User Id', value: 'creatorUserId' }
 ]

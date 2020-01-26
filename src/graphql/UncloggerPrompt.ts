@@ -6,7 +6,7 @@ export const ListUncloggerPrompts = gql`
     $limit: Int
     $offset: Int
     $searchText: String
-    $status: String
+    $status: UncloggerPromptApprovalStatus
   ) {
     listUncloggerPrompts(
       limit: $limit
@@ -26,7 +26,10 @@ export const ListUncloggerPrompts = gql`
 `
 
 export const CountUncloggerPrompts = gql`
-  query CountUncloggerPrompts($searchText: String, $status: String) {
+  query CountUncloggerPrompts(
+    $searchText: String
+    $status: UncloggerPromptApprovalStatus
+  ) {
     countUncloggerPrompts(searchText: $searchText, status: $status) {
       count
     }
@@ -39,7 +42,7 @@ export const CreateUncloggerPrompt = gql`
     $category: UncloggerPromptCategory!
     $body: String!
     $language: Language
-    $status: ApprovalStatus
+    $status: UncloggerPromptApprovalStatus
     $creatorUserId: String
   ) {
     createUncloggerPrompt(
@@ -62,7 +65,7 @@ export const UpdateUncloggerPrompt = gql`
     $category: String
     $body: String
     $language: String
-    $status: String
+    $status: UncloggerPromptApprovalStatus
     $reviewerUserId: String
   ) {
     createUncloggerPrompt(

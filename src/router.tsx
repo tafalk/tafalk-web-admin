@@ -1,6 +1,6 @@
 import TafalkAdminHomeView from './views/Home'
 import TafalkAdminFlagsView from './views/Flags'
-import TafalkAdminUncloggerHintsView from './views/UncloggerPrompts'
+import TafalkAdminUncloggerPromptsView from './views/UncloggerPrompts'
 
 const router = [
   {
@@ -13,8 +13,8 @@ const router = [
     component: TafalkAdminFlagsView
   },
   {
-    path: '/uncloggerHints',
-    component: TafalkAdminUncloggerHintsView
+    path: '/uncloggerPrompts',
+    component: TafalkAdminUncloggerPromptsView
   }
 ]
 
