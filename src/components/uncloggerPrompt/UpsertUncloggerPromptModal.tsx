@@ -8,7 +8,7 @@ import { CreateUncloggerPrompt } from '../../graphql/UncloggerPrompt'
 import {
   uncloggerPromptCategoryEnumName,
   supportedLanguageEnumName,
-  approvalStatusEnumName
+  uncloggerPromptApprovalStatusEnumName
 } from '../../utils/appsyncConstants'
 import { UncloggerPromptModalPropType } from '../../types/prop'
 import { AppSyncListEnumValuesResultData } from '../../types/appsync/introspection'
@@ -19,7 +19,7 @@ const UpsertUncloggerPromptModal: React.FC<UncloggerPromptModalPropType> = (
   props: UncloggerPromptModalPropType
 ) => {
   // destruct props
-  const { show, onHide, initialData } = props
+  const { show, onHide, onTriggerReload, initialData } = props
   // compute data
   const isNew = !initialData || Object.entries(initialData).length === 0
   const headerText = isNew ? 'New Unclogger Prompt' : 'Edit Unclogger Prompt'
@@ -61,7 +61,7 @@ const UpsertUncloggerPromptModal: React.FC<UncloggerPromptModalPropType> = (
         )
         const approvalStatusOptionsRequest = API.graphql(
           graphqlOperation(ListEnumValues, {
-            enumName: approvalStatusEnumName
+            enumName: uncloggerPromptApprovalStatusEnumName
           })
         )
         // collect responses
@@ -89,7 +89,7 @@ const UpsertUncloggerPromptModal: React.FC<UncloggerPromptModalPropType> = (
           )
         )
       } catch (err) {
-        console.log(JSON.stringify(err))
+        console.log(err)
       }
     })()
   }, [show, categoryOptions])
@@ -112,6 +112,7 @@ const UpsertUncloggerPromptModal: React.FC<UncloggerPromptModalPropType> = (
         data: AppSyncCreateUncloggerPromptResultData
       }
       console.log(JSON.stringify(result))
+      await onTriggerReload()
       onHide()
     } catch (err) {
       console.log(JSON.stringify(err))
@@ -120,6 +121,7 @@ const UpsertUncloggerPromptModal: React.FC<UncloggerPromptModalPropType> = (
   const reject = async (): Promise<void> => {
     try {
       // TODO: Implement Logic
+      await onTriggerReload()
       onHide()
     } catch (err) {
       console.log(JSON.stringify(err))
@@ -128,6 +130,7 @@ const UpsertUncloggerPromptModal: React.FC<UncloggerPromptModalPropType> = (
   const approve = async (): Promise<void> => {
     try {
       // TODO: Implement Logic
+      await onTriggerReload()
       onHide()
     } catch (err) {
       console.log(JSON.stringify(err))

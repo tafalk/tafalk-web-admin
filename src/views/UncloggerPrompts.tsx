@@ -9,10 +9,7 @@ import Table from 'react-bootstrap/Table'
 import InputGroup from 'react-bootstrap/InputGroup'
 import FormControl from 'react-bootstrap/FormControl'
 import Pagination from 'react-bootstrap/Pagination'
-import {
-  uncloggerPromptTableHeaders,
-  itemsPerPageOptions
-} from '../utils/tableUtils'
+import { itemsPerPageOptions } from '../utils/tableUtils'
 import {
   uncloggerPromptStatuses,
   allPromptStatusesText
@@ -30,7 +27,15 @@ import {
 
 const UncloggerPromptsView: React.FC = () => {
   // Hooks
-  const [isUpsertDialogVisible, setIsUpsertDialogVisible] = useState(false)
+  const [isUpsertDialogVisible, setIsUpsertDialogVisible] = useState<boolean>(
+    false
+  )
+  const [upsertDialogInitialData, setUpsertDialogInitialData] = useState({
+    category: '',
+    body: '',
+    language: '',
+    status: ''
+  })
   const [statusFilter, setStatusFilter] = useState<string>('')
   const [searchText, setSearchText] = useState<string>('')
   const [tablePage, setTablePage] = useState<number>(1)
@@ -42,7 +47,7 @@ const UncloggerPromptsView: React.FC = () => {
     ;(async (): Promise<void> => {
       try {
         const [result, countResult] = await Promise.all([
-          (await API.graphql(
+          API.graphql(
             graphqlOperation(ListUncloggerPrompts, {
               limit: itemsPerPage,
               offset: tablePage - 1,
@@ -52,10 +57,10 @@ const UncloggerPromptsView: React.FC = () => {
                   ? statusFilter
                   : undefined
             })
-          )) as {
+          ) as Promise<{
             data: AppSyncListUncloggerPromptsResultData
-          },
-          (await API.graphql(
+          }>,
+          API.graphql(
             graphqlOperation(CountUncloggerPrompts, {
               searchText,
               status:
@@ -63,12 +68,10 @@ const UncloggerPromptsView: React.FC = () => {
                   ? statusFilter
                   : undefined
             })
-          )) as {
+          ) as Promise<{
             data: AppSyncCountUncloggerPromptsResultData
-          }
+          }>
         ])
-        console.log('Result:')
-        console.log(result)
         setTotalPromptCount(countResult.data.countUncloggerPrompts ?? 0)
         setPrompts(result.data.listUncloggerPrompts ?? [])
       } catch (err) {
@@ -76,6 +79,15 @@ const UncloggerPromptsView: React.FC = () => {
       }
     })()
   }, [itemsPerPage, searchText, statusFilter, tablePage])
+
+  // Constants
+  const uncloggerPromptTableHeaders = [
+    { text: 'Id', value: 'id' },
+    { text: 'Review Status', value: 'status' },
+    { text: 'Category', value: 'category' },
+    { text: 'Body', value: 'body' },
+    { text: 'Creator User Id', value: 'creatorUserId' }
+  ]
 
   // Functions
   const pageCount = (): number => {
@@ -100,9 +112,46 @@ const UncloggerPromptsView: React.FC = () => {
     const currTarget = e.currentTarget as HTMLInputElement
     setSearchText(currTarget.value)
   }
-  const onEditClicked = (e: React.SyntheticEvent): void => {
-    const currTarget = e.currentTarget as HTMLInputElement
-    console.log(currTarget)
+  const onAddNewClicked = (): void => {
+    setUpsertDialogInitialData({
+      category: '',
+      body: '',
+      language: '',
+      status: ''
+    })
+    setIsUpsertDialogVisible(true)
+  }
+  const onEditClicked = (id: string): void => {
+    const prompt = prompts.find(p => p.id === id)
+    setUpsertDialogInitialData({
+      category: prompt?.category ?? '',
+      body: prompt?.body ?? '',
+      language: prompt?.language ?? '',
+      status: prompt?.status ?? ''
+    })
+    setIsUpsertDialogVisible(true)
+  }
+
+  const refreshCurrentData = async (): Promise<void> => {
+    try {
+      const result = (await API.graphql(
+        graphqlOperation(ListUncloggerPrompts, {
+          limit: itemsPerPage,
+          offset: tablePage - 1,
+          searchText,
+          status:
+            statusFilter && statusFilter !== allPromptStatusesText
+              ? statusFilter
+              : undefined
+        })
+      )) as {
+        data: AppSyncListUncloggerPromptsResultData
+      }
+      setPrompts(result.data.listUncloggerPrompts ?? [])
+      // setIsUpsertDialogVisible(false)
+    } catch (err) {
+      console.log(JSON.stringify(err))
+    }
   }
 
   // Render
@@ -117,7 +166,7 @@ const UncloggerPromptsView: React.FC = () => {
         </Col>
         <Col sm={{ span: 2, offset: 4 }}>
           {/* Create New Button */}
-          <Button block onClick={(): void => setIsUpsertDialogVisible(true)}>
+          <Button block onClick={(): void => onAddNewClicked()}>
             New
           </Button>
         </Col>
@@ -163,15 +212,11 @@ const UncloggerPromptsView: React.FC = () => {
           </thead>
           <tbody>
             {prompts.map((p: AppSyncUncloggerPrompt) => (
-              <tr key={p.id}>
-                <td
-                  style={{ cursor: 'pointer' }}
-                  onClick={(e): void => onEditClicked(e)}
-                >
-                  <span aria-label="Edit" role="image">
-                    ✏️
-                  </span>
-                </td>
+              <tr
+                key={p.id}
+                style={{ cursor: 'pointer' }}
+                onClick={(): void => onEditClicked(p.id)}
+              >
                 <td>{p.id}</td>
                 <td>{p.status}</td>
                 <td>{p.category}</td>
@@ -224,7 +269,8 @@ const UncloggerPromptsView: React.FC = () => {
       <TafalkAdminUpsertUncloggerPromptModal
         show={isUpsertDialogVisible}
         onHide={(): void => setIsUpsertDialogVisible(false)}
-        initialData={undefined}
+        onTriggerReload={async (): Promise<void> => await refreshCurrentData()}
+        initialData={upsertDialogInitialData}
       />
     </Container>
   )
