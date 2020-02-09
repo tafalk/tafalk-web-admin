@@ -4,141 +4,214 @@ import Modal from 'react-bootstrap/Modal'
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 import { ListEnumValues } from '../../graphql/Introspection'
-import { CreateUncloggerPrompt } from '../../graphql/UncloggerPrompt'
+import {
+  CreateUncloggerPrompt,
+  UpdateUncloggerPromptContent,
+  UpdateUncloggerPromptReview
+} from '../../graphql/UncloggerPrompt'
 import {
   uncloggerPromptCategoryEnumName,
-  supportedLanguageEnumName,
-  uncloggerPromptApprovalStatusEnumName
+  supportedLanguageEnumName
 } from '../../utils/appsyncConstants'
 import { UncloggerPromptModalPropType } from '../../types/prop'
 import { AppSyncListEnumValuesResultData } from '../../types/appsync/introspection'
+import {
+  uncloggerPromptDeclinedStatus,
+  uncloggerPromptAcceptedStatus,
+  uncloggerPromptImmutableStatuses
+} from '../../utils/constants'
 import { GetCurrAuthUserId } from '../../utils/functions'
-import { AppSyncCreateUncloggerPromptResultData } from '../../types/appsync/uncloggerPrompt'
 
 const UpsertUncloggerPromptModal: React.FC<UncloggerPromptModalPropType> = (
   props: UncloggerPromptModalPropType
 ) => {
-  // destruct props
-  const { show, onHide, onTriggerReload, initialData } = props
-  // compute data
-  const isNew = !initialData || Object.entries(initialData).length === 0
-  const headerText = isNew ? 'New Unclogger Prompt' : 'Edit Unclogger Prompt'
-
   // Hooks
+  const [headerText, setHeaderText] = useState<string>('')
   const [currAuthUserId, setCurrAuthUserId] = useState<string | undefined>(
     undefined
   )
-  const [{ category, body, language, status }, setFormData] = useState({
-    category: initialData?.category,
-    body: initialData?.body,
-    language: initialData?.language,
-    status: initialData?.status
-  })
+  const [isEdited, setIsEdited] = useState<boolean>(false)
+
+  const [category, setCategory] = useState<string>('')
+  const [body, setBody] = useState<string>('')
+  const [language, setLanguage] = useState<string>('')
+  const [reviewNote, setReviewNote] = useState<string>('')
+
   const [categoryOptions, setCategoryOptions] = useState<string[]>([])
   const [supportedLanguageOptions, setSupportedLanguageOptions] = useState<
     string[]
   >([])
-  const [approvalStatusOptions, setApprovalStatusOptions] = useState<string[]>(
-    []
-  )
+
   // Load Authenticated User and Select Options
   useEffect(() => {
     ;(async (): Promise<void> => {
       try {
         // Load Authenticated User Name
-        const currAuthUserId = await GetCurrAuthUserId()
-        setCurrAuthUserId(currAuthUserId)
-        // Send the requests
-        const categoryOptionsRequest = API.graphql(
-          graphqlOperation(ListEnumValues, {
-            enumName: uncloggerPromptCategoryEnumName
-          })
-        )
-        const supportedLanguageOptionsRequest = API.graphql(
-          graphqlOperation(ListEnumValues, {
-            enumName: supportedLanguageEnumName
-          })
-        )
-        const approvalStatusOptionsRequest = API.graphql(
-          graphqlOperation(ListEnumValues, {
-            enumName: uncloggerPromptApprovalStatusEnumName
-          })
-        )
-        // collect responses
-        const categoryOptionsResult = (await categoryOptionsRequest) as {
-          data: AppSyncListEnumValuesResultData
-        }
-        const supportedLanguageOptionsResult = (await supportedLanguageOptionsRequest) as {
-          data: AppSyncListEnumValuesResultData
-        }
-        const approvalStatusOptionsResult = (await approvalStatusOptionsRequest) as {
-          data: AppSyncListEnumValuesResultData
-        }
-        // set the states
-        setCategoryOptions(
-          categoryOptionsResult.data.enum.enumValues.map(({ name }) => name)
-        )
-        setSupportedLanguageOptions(
-          supportedLanguageOptionsResult.data.enum.enumValues.map(
-            ({ name }) => name
+        setCurrAuthUserId(await GetCurrAuthUserId())
+
+        if (
+          !categoryOptions ||
+          !categoryOptions.length ||
+          !supportedLanguageOptions ||
+          !supportedLanguageOptions.length
+        ) {
+          // Collect enum values
+          const [
+            categoryOptionsResult,
+            supportedLanguageOptionsResult
+          ] = await Promise.all([
+            API.graphql(
+              graphqlOperation(ListEnumValues, {
+                enumName: uncloggerPromptCategoryEnumName
+              })
+            ) as Promise<{
+              data: AppSyncListEnumValuesResultData
+            }>,
+            API.graphql(
+              graphqlOperation(ListEnumValues, {
+                enumName: supportedLanguageEnumName
+              })
+            ) as Promise<{
+              data: AppSyncListEnumValuesResultData
+            }>
+          ])
+          // set the states
+          setCategoryOptions(
+            categoryOptionsResult.data.enum.enumValues.map(({ name }) => name)
           )
-        )
-        setApprovalStatusOptions(
-          approvalStatusOptionsResult.data.enum.enumValues.map(
-            ({ name }) => name
+          setSupportedLanguageOptions(
+            supportedLanguageOptionsResult.data.enum.enumValues.map(
+              ({ name }) => name
+            )
           )
-        )
+        }
+
+        if (props.show) {
+          console.log('show modal with props: ' + props?.initialData)
+          // When modal is shown
+          setHeaderText(
+            props.isNew ? 'New Unclogger Prompt' : 'Edit Unclogger Prompt'
+          )
+          setCategory(props?.initialData?.category ?? '')
+          setBody(props?.initialData?.body ?? '')
+          setLanguage(props?.initialData?.language ?? '')
+          setReviewNote(props?.initialData?.reviewNote ?? '')
+        }
       } catch (err) {
         console.log(err)
       }
     })()
-  }, [show, categoryOptions])
+    // Cleanup
+    if (props.show) {
+      return (): void => {
+        setHeaderText('')
+        setCategory('')
+        setBody('')
+        setLanguage('')
+        setReviewNote('')
+      }
+    }
+  }, [categoryOptions, props, supportedLanguageOptions])
 
   // functions
-  const onChange = (e: React.SyntheticEvent): void => {
-    const { name, value } = e.target as HTMLInputElement
-    setFormData(prevState => ({ ...prevState, [name]: value }))
+  const onCategoryChange = (e: React.SyntheticEvent): void => {
+    setIsEdited(true) // Mark as edited
+    const { value } = e.target as HTMLInputElement
+    setCategory(value)
+  }
+  const onBodyChange = (e: React.SyntheticEvent): void => {
+    setIsEdited(true) // Mark as edited
+    const { value } = e.target as HTMLInputElement
+    setBody(value)
+  }
+  const onLanguageChange = (e: React.SyntheticEvent): void => {
+    setIsEdited(true) // Mark as edited
+    const { value } = e.target as HTMLInputElement
+    setLanguage(value)
+  }
+  const onReviewNoteChange = (e: React.SyntheticEvent): void => {
+    const { value } = e.target as HTMLInputElement
+    setReviewNote(value)
   }
   const create = async (): Promise<void> => {
     try {
-      const result = (await API.graphql(
+      await API.graphql(
         graphqlOperation(CreateUncloggerPrompt, {
           category: category,
           body: body,
           language: language,
           creatorUserId: currAuthUserId
         })
-      )) as {
-        data: AppSyncCreateUncloggerPromptResultData
-      }
-      console.log(JSON.stringify(result))
-      await onTriggerReload()
-      onHide()
+      )
+      await props.onTriggerReload()
+      props.onHide()
     } catch (err) {
       console.log(JSON.stringify(err))
     }
   }
   const reject = async (): Promise<void> => {
     try {
-      // TODO: Implement Logic
-      await onTriggerReload()
-      onHide()
+      // Content Update, if any
+      if (isEdited) {
+        await API.graphql(
+          graphqlOperation(UpdateUncloggerPromptContent, {
+            id: props?.initialData?.id,
+            category: category,
+            body: body,
+            language: language,
+            reviewNote
+          })
+        )
+      }
+      // Review Update
+      await API.graphql(
+        graphqlOperation(UpdateUncloggerPromptReview, {
+          id: props?.initialData?.id,
+          reviewerUserId: currAuthUserId,
+          status: uncloggerPromptDeclinedStatus,
+          reviewNote
+        })
+      )
+      // Reload & Close
+      await props.onTriggerReload()
+      props.onHide()
     } catch (err) {
       console.log(JSON.stringify(err))
     }
   }
   const approve = async (): Promise<void> => {
     try {
-      // TODO: Implement Logic
-      await onTriggerReload()
-      onHide()
+      // Content Update, if any
+      if (isEdited) {
+        await API.graphql(
+          graphqlOperation(UpdateUncloggerPromptContent, {
+            id: props?.initialData?.id,
+            category: category,
+            body: body,
+            language: language,
+            reviewNote
+          })
+        )
+      }
+      // Review Update
+      await API.graphql(
+        graphqlOperation(UpdateUncloggerPromptReview, {
+          id: props?.initialData?.id,
+          reviewerUserId: currAuthUserId,
+          status: uncloggerPromptAcceptedStatus,
+          reviewNote
+        })
+      )
+      // Reload & Close
+      await props.onTriggerReload()
+      props.onHide()
     } catch (err) {
       console.log(JSON.stringify(err))
     }
   }
   // render
   return (
-    <Modal show={show} onHide={onHide}>
+    <Modal show={props.show} onHide={props.onHide}>
       {/* Modal Header */}
       <Modal.Header closeButton>
         <Modal.Title>{headerText}</Modal.Title>
@@ -153,8 +226,7 @@ const UpsertUncloggerPromptModal: React.FC<UncloggerPromptModalPropType> = (
               value={category}
               as="select"
               name="category"
-              readOnly={!isNew}
-              onChange={onChange}
+              onChange={onCategoryChange}
             >
               <option></option>
               {categoryOptions.map((c: string) => (
@@ -167,12 +239,11 @@ const UpsertUncloggerPromptModal: React.FC<UncloggerPromptModalPropType> = (
             <Form.Label>Body</Form.Label>
             <Form.Control
               as="textarea"
-              readOnly={!isNew}
               rows="3"
               placeholder="Enter Body"
               value={body}
               name="body"
-              onChange={onChange}
+              onChange={onBodyChange}
             />
           </Form.Group>
           {/* Language */}
@@ -182,8 +253,7 @@ const UpsertUncloggerPromptModal: React.FC<UncloggerPromptModalPropType> = (
               value={language}
               as="select"
               name="language"
-              readOnly={!isNew}
-              onChange={onChange}
+              onChange={onLanguageChange}
             >
               <option></option>
               {supportedLanguageOptions.map((l: string) => (
@@ -192,34 +262,33 @@ const UpsertUncloggerPromptModal: React.FC<UncloggerPromptModalPropType> = (
             </Form.Control>
           </Form.Group>
           {/* Status (visible if review) */}
-          {!isNew ?? (
-            <Form.Group controlId="status">
-              <Form.Label>Status</Form.Label>
+          {!props.isNew ?? (
+            <Form.Group controlId="reviewNote">
+              <Form.Label>Review Note</Form.Label>
               <Form.Control
-                value={status}
-                as="select"
-                name="status"
-                onChange={onChange}
-              >
-                <option></option>
-                {approvalStatusOptions.map((s: string) => (
-                  <option key={s}>{s}</option>
-                ))}
-              </Form.Control>
+                as="textarea"
+                rows="3"
+                placeholder="Enter Note"
+                value={reviewNote}
+                name="reviewNote"
+                onChange={onReviewNoteChange}
+              />
             </Form.Group>
           )}
         </Form>
       </Modal.Body>
       {/* Modal Footer Actions */}
       <Modal.Footer>
-        <Button variant="secondary" onClick={onHide}>
+        <Button variant="secondary" onClick={props.onHide}>
           Close
         </Button>
-        {isNew ? (
+        {props.isNew ? (
           <Button variant="primary" onClick={create}>
             Create
           </Button>
-        ) : (
+        ) : !uncloggerPromptImmutableStatuses.includes(
+            props?.initialData?.status ?? ''
+          ) ? (
           <>
             <Button variant="danger" onClick={reject}>
               Reject
@@ -228,6 +297,8 @@ const UpsertUncloggerPromptModal: React.FC<UncloggerPromptModalPropType> = (
               Approve
             </Button>
           </>
+        ) : (
+          <></>
         )}
       </Modal.Footer>
     </Modal>

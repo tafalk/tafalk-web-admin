@@ -30,10 +30,13 @@ const UncloggerPromptsView: React.FC = () => {
   const [isUpsertDialogVisible, setIsUpsertDialogVisible] = useState<boolean>(
     false
   )
+  const [isNew, setIsNew] = useState<boolean>(false)
   const [upsertDialogInitialData, setUpsertDialogInitialData] = useState({
+    id: '',
     category: '',
     body: '',
     language: '',
+    reviewNote: '',
     status: ''
   })
   const [statusFilter, setStatusFilter] = useState<string>('')
@@ -113,21 +116,27 @@ const UncloggerPromptsView: React.FC = () => {
     setSearchText(currTarget.value)
   }
   const onAddNewClicked = (): void => {
+    setIsNew(true)
     setUpsertDialogInitialData({
+      id: '',
       category: '',
       body: '',
       language: '',
-      status: ''
+      status: '',
+      reviewNote: ''
     })
     setIsUpsertDialogVisible(true)
   }
   const onEditClicked = (id: string): void => {
     const prompt = prompts.find(p => p.id === id)
+    setIsNew(false)
     setUpsertDialogInitialData({
+      id,
       category: prompt?.category ?? '',
       body: prompt?.body ?? '',
       language: prompt?.language ?? '',
-      status: prompt?.status ?? ''
+      status: prompt?.status ?? '',
+      reviewNote: prompt?.reviewNote ?? ''
     })
     setIsUpsertDialogVisible(true)
   }
@@ -268,6 +277,7 @@ const UncloggerPromptsView: React.FC = () => {
       {/* Upsert Dialog */}
       <TafalkAdminUpsertUncloggerPromptModal
         show={isUpsertDialogVisible}
+        isNew={isNew}
         onHide={(): void => setIsUpsertDialogVisible(false)}
         onTriggerReload={async (): Promise<void> => await refreshCurrentData()}
         initialData={upsertDialogInitialData}

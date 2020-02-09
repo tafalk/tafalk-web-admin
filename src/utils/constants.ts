@@ -1,8 +1,18 @@
+export const uncloggerPromptPendingStatus = 'Pending'
+export const uncloggerPromptDeclinedStatus = 'Declined'
+export const uncloggerPromptAcceptedStatus = 'Accepted'
+export const uncloggerPromptOnHoldStatus = 'OnHold'
+
+export const uncloggerPromptImmutableStatuses = [
+  uncloggerPromptDeclinedStatus,
+  uncloggerPromptAcceptedStatus
+]
+
 export const uncloggerPromptStatuses = [
-  'Pending',
-  'Declined',
-  'Accepted',
-  'OnHold'
+  uncloggerPromptPendingStatus,
+  uncloggerPromptDeclinedStatus,
+  uncloggerPromptAcceptedStatus,
+  uncloggerPromptOnHoldStatus
 ]
 
 export const allPromptStatusesText = 'All'

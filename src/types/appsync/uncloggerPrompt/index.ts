@@ -9,13 +9,6 @@ export type AppSyncCountUncloggerPromptsResultData = {
   countUncloggerPrompts: number
 }
 
-// Create
-export type AppSyncCreateUncloggerPromptResultData = {
-  createUncloggerPrompt: {
-    id: string
-  }
-}
-
 export type AppSyncUncloggerPrompt = {
   id: string
   category: string
@@ -29,4 +22,24 @@ export type AppSyncUncloggerPrompt = {
   reviewNote: string
   createTime: string
   reviewTime: string
+}
+
+// Create
+export type AppSyncCreateUncloggerPromptResultData = {
+  createUncloggerPrompt: {
+    id: string
+  }
+}
+
+// Update
+export type AppSyncUpdateUncloggerPromptContentResultData = {
+  updateUncloggerPromptContent: {
+    id: string
+  }
+}
+
+export type AppSyncUpdateUncloggerPromptReviewResultData = {
+  updateUncloggerPromptReview: {
+    id: string
+  }
 }

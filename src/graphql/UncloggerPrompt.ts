@@ -17,6 +17,7 @@ export const ListUncloggerPrompts = gql`
       id
       category
       body
+      language
       creatorUserId
       createTime
       status
@@ -59,24 +60,36 @@ export const CreateUncloggerPrompt = gql`
   }
 `
 
-export const UpdateUncloggerPrompt = gql`
-  mutation UpdateUncloggerPrompt(
+// Update
+export const UpdateUncloggerPromptReview = gql`
+  mutation UpdateUncloggerPromptReview(
+    $id: ID!
+    $reviewerUserId: String
+    $status: UncloggerPromptApprovalStatus
+    $reviewNote: String
+  ) {
+    updateUncloggerPromptReview(
+      input: {
+        id: $id
+        reviewerUserId: $reviewerUserId
+        status: $status
+        reviewNote: $reviewNote
+      }
+    ) {
+      id
+    }
+  }
+`
+
+export const UpdateUncloggerPromptContent = gql`
+  mutation UpdateUncloggerPromptContent(
     $id: ID!
     $category: String
     $body: String
     $language: String
-    $status: UncloggerPromptApprovalStatus
-    $reviewerUserId: String
   ) {
-    createUncloggerPrompt(
-      input: {
-        id: $id
-        category: $category
-        body: $body
-        language: $language
-        status: $status
-        reviewerUserId: $reviewerUserId
-      }
+    updateUncloggerPromptContent(
+      input: { id: $id, category: $category, body: $body, language: $language }
     ) {
       id
     }
