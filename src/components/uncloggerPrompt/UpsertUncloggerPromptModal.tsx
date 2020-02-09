@@ -87,7 +87,6 @@ const UpsertUncloggerPromptModal: React.FC<UncloggerPromptModalPropType> = (
         }
 
         if (props.show) {
-          console.log('show modal with props: ' + props?.initialData)
           // When modal is shown
           setHeaderText(
             props.isNew ? 'New Unclogger Prompt' : 'Edit Unclogger Prompt'
