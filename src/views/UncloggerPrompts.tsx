@@ -9,10 +9,10 @@ import Table from 'react-bootstrap/Table'
 import InputGroup from 'react-bootstrap/InputGroup'
 import FormControl from 'react-bootstrap/FormControl'
 import Pagination from 'react-bootstrap/Pagination'
-import { itemsPerPageOptions } from '../utils/tableUtils'
 import {
   uncloggerPromptStatuses,
-  allPromptStatusesText
+  allPromptStatusesText,
+  tableItemsPerPageOptions
 } from '../utils/constants'
 import {
   ListUncloggerPrompts,
@@ -253,7 +253,7 @@ const UncloggerPromptsView: React.FC = () => {
                 await itemsPerPageChanged(e)
               }
             >
-              {itemsPerPageOptions.map((o: number) => (
+              {tableItemsPerPageOptions.map((o: number) => (
                 <option key={o}>{o}</option>
               ))}
             </FormControl>

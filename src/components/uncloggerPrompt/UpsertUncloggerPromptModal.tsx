@@ -42,7 +42,7 @@ const UpsertUncloggerPromptModal: React.FC<UncloggerPromptModalPropType> = (
     string[]
   >([])
 
-  // Load Authenticated User and Select Options
+  // Load Authenticated User, Select Options and Intitial Values
   useEffect(() => {
     ;(async (): Promise<void> => {
       try {
@@ -132,6 +132,8 @@ const UpsertUncloggerPromptModal: React.FC<UncloggerPromptModalPropType> = (
     const { value } = e.target as HTMLInputElement
     setReviewNote(value)
   }
+
+  // Actions
   const create = async (): Promise<void> => {
     try {
       await API.graphql(
@@ -260,7 +262,7 @@ const UpsertUncloggerPromptModal: React.FC<UncloggerPromptModalPropType> = (
               ))}
             </Form.Control>
           </Form.Group>
-          {/* Status (visible if review) */}
+          {/* Review Note (visible if review) */}
           {!props.isNew ?? (
             <Form.Group controlId="reviewNote">
               <Form.Label>Review Note</Form.Label>

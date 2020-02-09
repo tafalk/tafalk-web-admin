@@ -1,11 +1,12 @@
 import { AppSyncUser } from '../user'
 
-// ListUncloggerPrompts
+// ListFlags
 export type AppSyncListFlagsResultData = {
-  listUncloggerPrompts: {
-    items: AppSyncFlag[]
-    nextToken: string
-  }
+  listFlags: AppSyncFlag[]
+}
+
+export type AppSyncCountFlagsResultData = {
+  countFlags: number
 }
 
 export type AppSyncFlag = {
@@ -19,7 +20,7 @@ export type AppSyncFlag = {
   detail: string
   reviewerUserId: string
   reviewerUser: AppSyncUser
-  reviewStatus: string
+  status: string
   reviewNote: string
   createTime: string
   lastUpdateTime: string

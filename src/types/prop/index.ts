@@ -14,3 +14,21 @@ export type UncloggerPromptModalPropType = {
       }
     | undefined
 }
+
+export type FlagModalPropType = {
+  show: boolean
+  onHide: () => void
+  onTriggerReload: () => Promise<void>
+  initialData:
+    | {
+        id: string
+        contentType: string
+        contentId: string
+        category: string
+        type: string
+        detail: string
+        status: string
+        reviewNote: string
+      }
+    | undefined
+}
