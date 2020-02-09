@@ -43,7 +43,6 @@ export const CreateUncloggerPrompt = gql`
     $category: UncloggerPromptCategory!
     $body: String!
     $language: Language
-    $status: UncloggerPromptApprovalStatus
     $creatorUserId: String
   ) {
     createUncloggerPrompt(
@@ -51,7 +50,6 @@ export const CreateUncloggerPrompt = gql`
         category: $category
         body: $body
         language: $language
-        status: $status
         creatorUserId: $creatorUserId
       }
     ) {
@@ -84,9 +82,9 @@ export const UpdateUncloggerPromptReview = gql`
 export const UpdateUncloggerPromptContent = gql`
   mutation UpdateUncloggerPromptContent(
     $id: ID!
-    $category: String
+    $category: UncloggerPromptCategory
     $body: String
-    $language: String
+    $language: Language
   ) {
     updateUncloggerPromptContent(
       input: { id: $id, category: $category, body: $body, language: $language }
